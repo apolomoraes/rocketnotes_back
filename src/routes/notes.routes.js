@@ -23,7 +23,7 @@ notesRoutes.post('/:user_id', /*myMiddleware,*/ notesController.create)
 
 notesRoutes.get('/:id', notesController.show)
 notesRoutes.delete('/:id', notesController.delete)
-
+notesRoutes.get('/', notesController.index)
 
 
 module.exports = notesRoutes
