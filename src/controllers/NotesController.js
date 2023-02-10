@@ -1,7 +1,7 @@
 const knex = require('../database/knex')
 
-class NotesController{
-  async create(request, response){
+class NotesController {
+  async create(request, response) {
     const { title, description, tags, links } = request.body;
     const { user_id } = request.params;
 
@@ -30,8 +30,8 @@ class NotesController{
     });
 
     await knex("tags").insert(tagsInsert);
-    
-    response.json();
+
+    return response.json();
 
   }
 
@@ -50,7 +50,7 @@ class NotesController{
     });
   }
 
-  async delete(request, response){
+  async delete(request, response) {
     const { id } = request.params;
 
     await knex("notes").where({ id }).delete();
@@ -58,26 +58,26 @@ class NotesController{
     return response.json();
   }
 
-  async index(request, response){
+  async index(request, response) {
     const { title, user_id, tags } = request.query;
 
-  
+
     let notes;
 
     if (tags) {
       const filterTags = tags.split(',').map(tag => tag.trim());
 
       notes = await knex("tags")
-      .select([
-        "notes.id",
-        "notes.title",
-        "notes.user_id",
-      ])
-      .where("notes.user_id", user_id)
-      .whereLike("notes.title", `%${title}%`)
-      .whereIn("name", filterTags)
-      .innerJoin("notes", "notes.id", "tags.note_id")
-      .orderBy("notes.title");
+        .select([
+          "notes.id",
+          "notes.title",
+          "notes.user_id",
+        ])
+        .where("notes.user_id", user_id)
+        .whereLike("notes.title", `%${title}%`)
+        .whereIn("name", filterTags)
+        .innerJoin("notes", "notes.id", "tags.note_id")
+        .orderBy("notes.title");
 
     } else {
       notes = await knex("notes")
@@ -85,17 +85,16 @@ class NotesController{
         .whereLike("title", `%${title}%`)
         .orderBy("title")
     }
-  
-    
-      const userTags = await knex("tags").where({ user_id });
-      const notesWithTags = notes.map(note => {
-       const noteTags = userTags.filter(tag => tag.note_id === note.id);
 
-        return {
-          ...note,
-           tags: noteTags
-         }
-     })
+
+    const userTags = await knex("tags").where({ user_id });
+    const notesWithTags = notes.map(note => {
+      const noteTags = userTags.filter(tag => tag.note_id === note.id);
+      return {
+        ...note,
+        tags: noteTags
+      }
+    })
 
     return response.json(notesWithTags);
   }
