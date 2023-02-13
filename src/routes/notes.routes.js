@@ -1,6 +1,8 @@
 const { Router } = require('express')
 
 const NotesController = require('../controllers/NotesController')
+const ensureAuthenticated = require("../middlewares/ensureAuthenticated");
+
 
 const notesRoutes = Router()
 
@@ -16,9 +18,9 @@ const notesRoutes = Router()
 
 const notesController = new NotesController()
 
-// usersRoutes.use(myMiddleware) está linha aplica o middleware para todas rotas de usuário
+notesRoutes.use(ensureAuthenticated);
 
-notesRoutes.post('/:user_id', /*myMiddleware,*/ notesController.create)
+notesRoutes.post('/', /*myMiddleware,*/ notesController.create)
 //o middleware nesse caso está se aplicando para uma rota específica
 
 notesRoutes.get('/:id', notesController.show)
